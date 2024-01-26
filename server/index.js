@@ -16,6 +16,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('An user has disconnected')
     })
+    // la conexion en concreto, cuando reciba el evento de 'chat message', hace algo ->>
+    socket.on('chat message', (msg) => {
+        io.emit('chat message', msg)
+    })
 })
 
 app.use(logger('dev'))

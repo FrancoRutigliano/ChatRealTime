@@ -12,6 +12,12 @@
 
         const form = document.getElementById('form')
         const input = document.getElementById('input')
+        const messages = document.getElementById('messages')
+        // esto es cuando el socket reciba un mensaje 'chat message'
+        socket.on('chat message', (msg) => {
+            const item = `<li>${msg}</li>`
+            messages.insertAdjacentHTML('beforeend', item)
+        })
 
         form.addEventListener('submit', (e) => {
             e.preventDefault()
@@ -67,7 +73,7 @@
             border: 1px solid #eee;
             flex: 1;
             margin: 4px;
-            padding: 5px 8px;
+            padding: 12px 8px;
         }
 
         #input:focus {
@@ -78,7 +84,7 @@
             background: #adff2f;
             color: #000000;
             border: 0;
-            margin: 4px;
+            margin: 5px;
             border-radius: 4px;
             cursor: pointer;
         }
@@ -89,12 +95,32 @@
             border-radius: 6px;
         }
 
+        #messages {
+            list-style-type: none;
+        }
+
+        ul#messages li {
+            margin-bottom: 10px;
+            max-width: 70%; /* Ajusta el ancho máximo del globo según tus necesidades */
+            padding: 10px;
+            border-radius: 10px;
+            word-wrap: break-word;
+            color: #fff; /* Color del texto para mensajes del usuario */
+        }
+        
+        #messages > li:nth-child(odd) {
+            background-color: #4CAF50;
+        }
+
+
+
     </style>
 </head>
 
 <body>
 
     <section id="chat">
+        <ul id="messages"></ul>
         <form id="form">
             <input type="text" name="message" id="input" placeholder="Escribi un mensaje"
             autocomplete="off">
