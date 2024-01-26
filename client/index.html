@@ -9,6 +9,18 @@
         import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js';
 
         const socket = io()
+
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            if (input.value) {
+                socket.emit('chat message', input.value)
+                input.value = ''
+            }
+        })
     </script>
         
     <style>
@@ -40,7 +52,43 @@
             height: 100%;
             position: relative;
         }
+
+        #form {
+            bottom: 0;
+            display: flex;
+            left: 0;
+            padding: 4px;
+            position: absolute;
+            right: 0;
+        }
+
+        #input {
+            border-radius: 9999px;
+            border: 1px solid #eee;
+            flex: 1;
+            margin: 4px;
+            padding: 5px 8px;
+        }
+
+        #input:focus {
+            outline: 0;
+        }
+
+        #form > button {
+            background: #adff2f;
+            color: #000000;
+            border: 0;
+            margin: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     
+        #form > button:hover {
+            transition: 0.2s;
+            background: #8dcf2b;
+            border-radius: 6px;
+        }
+
     </style>
 </head>
 
