@@ -2,7 +2,6 @@ import express from 'express';
 import logger from 'morgan';
 import dotenv from 'dotenv';
 import { createClient } from '@libsql/client';
-//import { DB_TOKEN } from './.env'
 
 import { Server } from 'socket.io';
 import { createServer } from 'node:http';
@@ -20,7 +19,7 @@ const io = new Server(server, {
 // conexion a base de datos
 const db = createClient({
     url: "libsql://valid-old-lace-francorutigliano.turso.io",
-    authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIyMDI0LTAxLTI2VDE4OjUyOjMxLjg0MjAyMzQ0NloiLCJpZCI6IjQ1NDE5YTJhLWJjNjYtMTFlZS1hYmZmLWUyZTgyZWFhY2IwNSJ9.yiPFpCT-eYzYpswj5CTe7_sCyLxUDqxOICZM45-8K9vNdCygvEoWtWJHKN-jxyF8ehAn9C2yHMNntlW1ahXCBA"
+    authToken: process.env.DB_TOKEN
 })
 
 // iniciamos y creamos una tabla
