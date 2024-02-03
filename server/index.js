@@ -2,7 +2,6 @@ import express from 'express';
 import logger from 'morgan';
 import dotenv from 'dotenv';
 import { createClient } from '@libsql/client';
-//import { DB_TOKEN } from './.env'
 
 import { Server } from 'socket.io';
 import { createServer } from 'node:http';
@@ -20,8 +19,9 @@ const io = new Server(server, {
 // conexion a base de datos
 const db = createClient({
     url: "libsql://valid-old-lace-francorutigliano.turso.io",
-    authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIyMDI0LTAxLTI2VDE4OjUyOjMxLjg0MjAyMzQ0NloiLCJpZCI6IjQ1NDE5YTJhLWJjNjYtMTFlZS1hYmZmLWUyZTgyZWFhY2IwNSJ9.yiPFpCT-eYzYpswj5CTe7_sCyLxUDqxOICZM45-8K9vNdCygvEoWtWJHKN-jxyF8ehAn9C2yHMNntlW1ahXCBA"
+    authToken: process.env.DB_TOKEN
 })
+
 
 // iniciamos y creamos una tabla
 await db.execute(`
@@ -32,17 +32,49 @@ await db.execute(`
     )
 `)
 
-io.on('connection', (socket) => {
-    console.log('User has conected')
+io.on('connection', async (socket) => {
+    console.log('un usuario se ha conectado')
 
     socket.on('disconnect', () => {
-        console.log('An user has disconnected')
+        console.log('un usuario se ha desconectado')
     })
-    // la conexion en concreto, cuando reciba el evento de 'chat message', hace algo ->>
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg)
+
+
+    socket.on('chat message', async (msg) => {
+        let result
+        const username = socket.handshake.auth.username ?? 'anonymous'
+        console.log({ username })
+        try {
+            result = await db.execute({
+                sql: `INSERT INTO messages (content, user) VALUES (:messages, :username)`, // se utiliza para evitar sql injection
+                args: { messages: msg, username }
+            })
+        } catch (error) {
+            console.log(error)
+            return
+        }
+        io.emit('chat message', msg, result.lastInsertRowid.toString(), username)
     })
+    // recuperar los mensajes sin conexion, basicamente cuando estemos offline
+    if (!socket.recovered) {
+        try {
+            const results = await db.execute({
+                sql: `SELECT id, content, user FROM messages WHERE id > ?`,
+                args: [socket.handshake.auth.serverOffSet ?? 0]
+            })
+
+            results.rows.forEach(row => {
+                socket.emit('chat message', row.content, row.id.toString())
+            });
+        } catch (error) {
+            console.log(error)
+        }
+    }
 })
+
+
+
+
 
 app.use(logger('dev'))
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +9,20 @@
     <script type="module">
         import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js';
 
-        const socket = io()
+        const socket = io({
+            auth: {
+                serverOffset: 0
+            }
+        })
 
         const form = document.getElementById('form')
         const input = document.getElementById('input')
         const messages = document.getElementById('messages')
         // esto es cuando el socket reciba un mensaje 'chat message'
-        socket.on('chat message', (msg) => {
+        socket.on('chat message', (msg, serverOffset) => {
             const item = `<li>${msg}</li>`
             messages.insertAdjacentHTML('beforeend', item)
+            socket.auth.serverOffserverOffset = serverOffset // ultimo mensaje a enviar
         })
 
         form.addEventListener('submit', (e) => {
@@ -28,7 +34,7 @@
             }
         })
     </script>
-        
+
     <style>
         *,
         *::before,
@@ -39,7 +45,7 @@
         :root {
             color-scheme: dark;
         }
-    
+
         body {
             margin: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -49,8 +55,8 @@
             padding: 36px;
             grid-template-rows: 1fr;
         }
-    
-        #chat{
+
+        #chat {
             border: 1px solid #ccc;
             border-radius: 4px;
             overflow: hidden;
@@ -80,7 +86,7 @@
             outline: 0;
         }
 
-        #form > button {
+        #form>button {
             background: #adff2f;
             color: #000000;
             border: 0;
@@ -88,8 +94,8 @@
             border-radius: 4px;
             cursor: pointer;
         }
-    
-        #form > button:hover {
+
+        #form>button:hover {
             transition: 0.2s;
             background: #8dcf2b;
             border-radius: 6px;
@@ -101,19 +107,18 @@
 
         ul#messages li {
             margin-bottom: 10px;
-            max-width: 70%; /* Ajusta el ancho máximo del globo según tus necesidades */
+            max-width: 70%;
+            /* Ajusta el ancho máximo del globo según tus necesidades */
             padding: 10px;
             border-radius: 10px;
             word-wrap: break-word;
-            color: #fff; /* Color del texto para mensajes del usuario */
+            color: #fff;
+            /* Color del texto para mensajes del usuario */
         }
-        
-        #messages > li:nth-child(odd) {
+
+        #messages>li:nth-child(odd) {
             background-color: #4CAF50;
         }
-
-
-
     </style>
 </head>
 
@@ -122,11 +127,11 @@
     <section id="chat">
         <ul id="messages"></ul>
         <form id="form">
-            <input type="text" name="message" id="input" placeholder="Escribi un mensaje"
-            autocomplete="off">
+            <input type="text" name="message" id="input" placeholder="Escribi un mensaje" autocomplete="off">
             <button type="submit">Enviar</button>
         </form>
     </section>
 
 </body>
+
 </html>
